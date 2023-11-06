@@ -1,0 +1,60 @@
+:root {
+  --light-color: #eaebed; /*Anti-flash white*/
+  --accent-color: #a3bac3; /* Cadet grey */
+  --fore-color: #01a7c2; /* Moonstone */
+  --dark-color: #223843; /* Gunmetal */
+  --card-color: #fff;
+  --link-color: #1166ff;
+  --spacer-color: #1166ff;
+  --form-color: #11aaff;
+}
+a {
+  text-decoration: underline;
+  color: var(--link-color);
+}
+body {
+  background-color: var(--light-color);
+  font-family: 'Roboto', sans-serif;
+  margin: 0px;
+  padding: 0px;
+}
+
+h1 {
+  font-size: 2em;
+  text-shadow: #888 2px 1px 5px;
+  color: #000;
+}
+hr {
+  border: 0;
+  height: 1px;
+
+  background: #fff;
+  background-image: linear-gradient(to right, #ffffff, #1166ff, #ffffff);
+}
+label {
+  font-size: 0.7em;
+  font-weight: bold;
+  padding: 0px;
+}
+.error {
+  color: red;
+}
+.site-card {
+  background-color: var(--card-color);
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  padding: 1em;
+}
+.site-container {
+  width: 100%;
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+}
+
+@media (max-width: 768px) {
+  .site-container {
+    width: 100%;
+    height: 100vh;
+  }
+}
