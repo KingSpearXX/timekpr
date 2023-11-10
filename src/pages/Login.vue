@@ -19,6 +19,8 @@
               </div>
               <p class="error" v-if="loginValidator">{{ loginValidator }}</p>
               <br />
+              <BaseCheckbox v-model="rememberMe" label="Remember Me" id="rememberMe" />
+              <br />
               <div class="form-button">
                 <BaseButton @click="login" type="submit">Login</BaseButton>
                 <p>
@@ -37,11 +39,12 @@
 <script setup>
 import BaseText from '../components/BaseText.vue';
 import BaseButton from '../components/BaseButton.vue';
+import BaseCheckbox from '@/components/BaseCheckbox.vue';
 import Icon from '../components/Icon.vue';
 
 import {ref} from 'vue';
-import {getAuth} from 'firebase/auth';
-import {signInWithEmailAndPassword} from 'firebase/auth';
+import {getAuth, setPersistence} from 'firebase/auth';
+import {signInWithEmailAndPassword, browserSessionPersistence, browserLocalPersistence} from 'firebase/auth';
 import {usersStore} from '../store/Users';
 import {siteStore} from '../store/Site';
 
@@ -52,6 +55,7 @@ const site = siteStore();
 const email = ref('');
 const password = ref('');
 const loginValidator = ref('');
+const rememberMe = ref(false);
 
 const login = async () => {
   site.setLoading(true);
@@ -61,8 +65,11 @@ const login = async () => {
     return;
   }
   try {
-    await signInWithEmailAndPassword(auth, email.value, password.value).then(userCredentials => {
-      users.user = userCredentials.user;
+    setPersistence(auth, rememberMe.value ? browserLocalPersistence : browserSessionPersistence).then(() => {
+      console.log('rememberMe: ' + rememberMe.value);
+      signInWithEmailAndPassword(auth, email.value, password.value).then(userCredentials => {
+        users.user = userCredentials.user;
+      });
     });
   } catch (error) {
     if (error.message === 'Firebase: Error (auth/invalid-login-credentials).') {
@@ -93,6 +100,10 @@ form {
   width: 100%;
   height: 100vh;
   display: flex;
+}
+.base-checkbox {
+  color: #fff;
+  font-size: 1.25em;
 }
 .card-container {
   width: 30%;
@@ -180,6 +191,10 @@ form {
   }
   button {
     width: 100%;
+  }
+  .base-checkbox {
+    color: #223843;
+    font-size: 1.25em;
   }
   .form-button {
     flex-direction: column;
