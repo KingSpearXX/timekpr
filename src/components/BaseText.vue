@@ -49,10 +49,10 @@ const attrs = computed(() => {
 <style>
 .base-text input {
   border: none;
-  border-bottom: 1px solid #ccc;
   outline: none;
   margin: 1em 0;
   font-size: 1em;
-  color: #11aaff;
+  color: #01a7c2;
+  background-color: transparent;
 }
 </style>

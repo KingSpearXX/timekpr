@@ -1,18 +1,23 @@
 <template>
-  <button class="base-button">
+  <button class="base-button" :type="button" @click="$emit('click')">
     <slot></slot>
   </button>
 </template>
 
-<script setup></script>
+<script setup>
+defineProps({
+  button: {
+    type: String,
+    default: 'button',
+  },
+});
+defineEmits(['click']);
+</script>
 
 <style>
 .base-button {
-  background-color: #007bff;
+  background-color: #01a7c2;
   color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
   cursor: pointer;
 }
 </style>

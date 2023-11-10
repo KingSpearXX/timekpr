@@ -35,6 +35,14 @@ const routes = [
     },
   },
   {
+    path: '/verified',
+    name: 'Verified',
+    component: () => import('../pages/Verified.vue'),
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
     path: '/forgot',
     name: 'Forgot',
     component: () => import('../pages/Forgot.vue'),
@@ -55,8 +63,18 @@ router.beforeEach(async (to, from, next) => {
     next('/');
     return;
   }
-
-  next();
+  if (users && !users.emailVerified && to.name !== 'Verified') {
+    next('/verified');
+    return;
+  } else if (users && users.emailVerified && to.name === 'Verified') {
+    console.log('verified');
+    next('/');
+    return;
+  }
+  else {
+    next();
+  }
+  
 });
 
 export default router;

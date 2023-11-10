@@ -8,19 +8,18 @@
         <div class="form-container login slide-in">
           <form @submit.prevent>
             <div class="form-cell">
-              <h1><Icon icon="fa-sharp fa-solid fa-person-circle-question" /> Forgot Password</h1>
-              <label>Email:</label>
-              <div class="form-item">
-                <Icon icon="fa-regular fa-user" /><BaseText type="text" v-model="email" id="email" />
-              </div>
+              <h1><Icon icon="fa-sharp fa-solid fa-person-circle-question" /> User not yet verified!</h1>
               <p>
-                Please enter your username/email if we have it on record we will send you an email to reset your
-                password
+                Please check your email and also your spam folder for a verification email. If you have not received a
+                verification email please click the button below to resend the verification email.
               </p>
-              <p class="error" v-if="emailValidator">{{ emailValidator }}</p>
+              <p>{{ emailSent }}</p>
               <br />
               <div class="form-button">
-                <BaseButton @click="forgotPassword" type="submit">Retrieve Password</BaseButton>
+                <BaseButton @click="verify" type="button">Resend Verification Email</BaseButton>
+              </div>
+              <div class="form-button">
+                <BaseButton @click="logout" type="button">Logout</BaseButton>
               </div>
             </div>
           </form>
@@ -31,40 +30,38 @@
 </template>
 
 <script setup>
-import BaseText from '../components/BaseText.vue';
 import BaseButton from '../components/BaseButton.vue';
 import Icon from '../components/Icon.vue';
 
+import {getAuth, sendEmailVerification, signOut} from 'firebase/auth';
+import {usersStore} from '../store/Users';
 import {ref} from 'vue';
-import {getAuth, sendPasswordResetEmail} from 'firebase/auth';
+import siteStore from '@/store/Site';
 
-const auth = getAuth();
-const email = ref('');
-const emailValidator = ref('');
+const users = usersStore().user;
+const emailSent = ref('');
 
-function forgotPassword() {
-  if (!validateEmail()) {
-    return;
+async function logout() {
+  try {
+    const auth = getAuth();
+    await signOut(auth);
+    users.user = null;
+  } catch (error) {
+    console.error(error);
   }
-  sendPasswordResetEmail(auth, email.value)
+}
+function verify() {
+  siteStore().setLoading(true);
+  var user = getAuth().currentUser;
+
+  sendEmailVerification(user)
     .then(() => {
-      emailValidator.value = 'Email Sent!';
+      emailSent.value = `Email Sent! to ${user.email}`;
     })
     .catch(error => {
-      emailValidator.value = error.message;
+      emailSent.value = `Error: ${error}`;
     });
-}
-
-function validateEmail() {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  // Validation of the email
-  if (!emailRegex.test(email.value)) {
-    emailValidator.value = 'Email is invalid.';
-    return false;
-  } else {
-    emailValidator.value = null;
-    return true;
-  }
+  siteStore().setLoading(false);
 }
 </script>
 
@@ -73,7 +70,7 @@ body {
   overflow: hidden;
 }
 button {
-  width: 30%;
+  width: 100%;
   font-size: 1.25em;
   font-weight: bold;
   border-radius: 50px;
@@ -97,9 +94,6 @@ form {
   flex-direction: row;
   align-items: center;
   height: 100%;
-}
-.error {
-  color: red;
 }
 .form-button {
   width: 98%;
