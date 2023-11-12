@@ -8,19 +8,9 @@
         <div class="form-container login slide-in">
           <form @submit.prevent>
             <div class="form-cell">
-              <h1><Icon icon="fa-sharp fa-solid fa-person-circle-question" /> User not yet verified!</h1>
-              <p>
-                Please check your email and also your spam folder for a verification email. If you have not received a
-                verification email please click the button below to resend the verification email.
-              </p>
-              <p>{{ emailSent }}</p>
+              <h1><Icon icon="fa-sharp fa-solid fa-person-circle-question" /> This is embarassing</h1>
+              <p>You're not supposed to be here. Please check your URL and try again.</p>
               <br />
-              <div class="form-button">
-                <BaseButton @click="verify" type="button">Resend Verification Email</BaseButton>
-              </div>
-              <div class="form-button">
-                <BaseButton @click="logout" type="button">Logout</BaseButton>
-              </div>
             </div>
           </form>
         </div>
@@ -30,39 +20,7 @@
 </template>
 
 <script setup>
-import BaseButton from '../components/BaseButton.vue';
 import Icon from '../components/Icon.vue';
-
-import {getAuth, sendEmailVerification, signOut} from 'firebase/auth';
-import {usersStore} from '../store/Users';
-import {ref} from 'vue';
-import siteStore from '@/store/Site';
-
-const users = usersStore().user;
-const emailSent = ref('');
-
-async function logout() {
-  try {
-    const auth = getAuth();
-    await signOut(auth);
-    users.user = null;
-  } catch (error) {
-    console.error(error);
-  }
-}
-function verify() {
-  siteStore().setLoading(true);
-  var user = getAuth().currentUser;
-
-  sendEmailVerification(user)
-    .then(() => {
-      emailSent.value = `Email Sent! to ${user.email}`;
-    })
-    .catch(error => {
-      emailSent.value = `Error: ${error}`;
-    });
-  siteStore().setLoading(false);
-}
 </script>
 
 <style scoped>

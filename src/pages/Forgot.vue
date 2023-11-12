@@ -69,11 +69,8 @@ function validateEmail() {
 </script>
 
 <style scoped>
-body {
-  overflow: hidden;
-}
 button {
-  width: 30%;
+  width: 100%;
   font-size: 1.25em;
   font-weight: bold;
   border-radius: 50px;
@@ -87,10 +84,10 @@ form {
 }
 .card-container {
   width: 30%;
-  height: 100vh;
   background-color: #a3bac3;
   border-radius: 0px;
-  padding: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 .component-flex {
   display: flex;
@@ -146,7 +143,6 @@ form {
 }
 .logo-container {
   width: 70%;
-  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -180,6 +176,8 @@ form {
   }
   .logo {
     font-size: 3.25em;
+    display: flex;
+    justify-content: center;
   }
   .logo-container {
     height: 40%;

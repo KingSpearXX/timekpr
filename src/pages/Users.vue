@@ -1,5 +1,7 @@
 <template>
-  <div>Home</div>
+  <div>
+    <h1><Icon icon="fa-solid fa-user" /> Manage Users</h1>
+  </div>
 </template>
 
 <script setup>

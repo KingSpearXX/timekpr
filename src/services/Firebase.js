@@ -1,7 +1,10 @@
 import {initializeApp} from 'firebase/app';
 import {getAuth, onAuthStateChanged} from 'firebase/auth';
-import {getDatabase} from 'firebase/database';
+import {getDatabase, onValue, ref} from 'firebase/database';
 import {usersStore} from '../store/Users.js';
+import {siteStore} from '../store/Site.js';
+
+
 
 const firebaseConfig = {
   apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
@@ -21,7 +24,21 @@ async function firebaseApp() {
       const auth = getAuth(app);
       onAuthStateChanged(auth, async user => {
         const users = usersStore();
+        const site = siteStore();
         users.user = user;
+        if(user) {       
+          const db = getDatabase();
+          const adminUID = ref(db, 'site/admin');
+          onValue(adminUID, snapshot => {
+            if(snapshot.val() === user.uid) {
+              site.admin = true;
+            } else if(snapshot.val() === null) {
+              site.admin = null;
+            } else {
+              site.admin = false;
+            }
+          });
+        }
         resolve(app);
       });
     } catch (error) {

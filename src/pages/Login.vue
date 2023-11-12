@@ -45,10 +45,12 @@ import Icon from '../components/Icon.vue';
 import {ref} from 'vue';
 import {getAuth, setPersistence} from 'firebase/auth';
 import {signInWithEmailAndPassword, browserSessionPersistence, browserLocalPersistence} from 'firebase/auth';
+import {getDatabase, ref as dbRef, onValue} from 'firebase/database';
 import {usersStore} from '../store/Users';
 import {siteStore} from '../store/Site';
+import {useRouter} from 'vue-router';
 
-const auth = getAuth();
+const router = useRouter();
 const users = usersStore();
 const site = siteStore();
 
@@ -57,37 +59,33 @@ const password = ref('');
 const loginValidator = ref('');
 const rememberMe = ref(false);
 
-const login = async () => {
+function login() {
   site.setLoading(true);
   if (email.value == '' || password.value == '') {
     loginValidator.value = 'Please enter your email and password';
     site.setLoading(false);
     return;
   }
-  try {
-    setPersistence(auth, rememberMe.value ? browserLocalPersistence : browserSessionPersistence).then(() => {
-      console.log('rememberMe: ' + rememberMe.value);
-      signInWithEmailAndPassword(auth, email.value, password.value).then(userCredentials => {
-        users.user = userCredentials.user;
-      });
+  const auth = getAuth();
+  signInWithEmailAndPassword(auth, email.value, password.value)
+    .then(userCredentials => {
+      setPersistence(auth, rememberMe.value ? browserLocalPersistence : browserSessionPersistence);
+      users.user = userCredentials.user;
+    })
+    .catch(error => {
+      if (error.message === 'Firebase: Error (auth/invalid-login-credentials).') {
+        loginValidator.value = 'Invalid email or password';
+      } else if (error.message === 'Firebase: Error (auth/user-not-found).') {
+        loginValidator.value = 'User not found';
+      } else {
+        loginValidator.value = error.message;
+      }
     });
-  } catch (error) {
-    if (error.message === 'Firebase: Error (auth/invalid-login-credentials).') {
-      loginValidator.value = 'Invalid email or password';
-    } else if (error.message === 'Firebase: Error (auth/user-not-found).') {
-      loginValidator.value = 'User not found';
-    } else {
-      loginValidator.value = error.message;
-    }
-  }
   site.setLoading(false);
-};
+}
 </script>
 
 <style scoped>
-body {
-  overflow: hidden;
-}
 button {
   width: 30%;
   font-size: 1.25em;
@@ -110,7 +108,8 @@ form {
   height: 100vh;
   background-color: #a3bac3;
   border-radius: 0px;
-  padding: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 .component-flex {
   display: flex;
@@ -166,7 +165,6 @@ form {
 }
 .logo-container {
   width: 70%;
-  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -204,6 +202,8 @@ form {
   }
   .logo {
     font-size: 3.25em;
+    display: flex;
+    justify-content: center;
   }
   .logo-container {
     height: 40%;

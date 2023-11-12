@@ -1,68 +1,35 @@
 <template>
   <div class="site-container">
-    <div class="component-flex">
-      <div class="logo-container">
-        <div class="logo slide-in"><Icon icon="fa-regular fa-clock" /> timekpr</div>
-      </div>
-      <div class="card-container">
-        <div class="form-container login slide-in">
-          <form @submit.prevent>
-            <div class="form-cell">
-              <h1><Icon icon="fa-sharp fa-solid fa-person-circle-question" /> User not yet verified!</h1>
-              <p>
-                Please check your email and also your spam folder for a verification email. If you have not received a
-                verification email please click the button below to resend the verification email.
-              </p>
-              <p>{{ emailSent }}</p>
-              <br />
-              <div class="form-button">
-                <BaseButton @click="verify" type="button">Resend Verification Email</BaseButton>
-              </div>
-              <div class="form-button">
-                <BaseButton @click="logout" type="button">Logout</BaseButton>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+    <h1><Icon icon="fas fa-gear" /> System Initialization</h1>
+    There is no admin set! please pick from the users below to be the admin.
+    <BaseSelect v-model="selectedUser" :options="allUsers" />
+    <form></form>
   </div>
 </template>
 
 <script setup>
+import BaseText from '../components/BaseText.vue';
 import BaseButton from '../components/BaseButton.vue';
+import BaseSelect from '../components/BaseSelect.vue';
 import Icon from '../components/Icon.vue';
+import fbAdmin from '../services/FirebaseAdmin.js';
+import {ref, computed, onBeforeMount} from 'vue';
+import {getDatabase, ref as dbRef, onValue} from 'firebase/database';
+import {siteStore} from '../store/Site.js';
 
-import {getAuth, sendEmailVerification, signOut} from 'firebase/auth';
-import {usersStore} from '../store/Users';
-import {ref} from 'vue';
-import siteStore from '@/store/Site';
+const site = siteStore();
+const allUsers = ref([]);
+const selectedUser = ref(null);
 
-const users = usersStore().user;
-const emailSent = ref('');
-
-async function logout() {
-  try {
-    const auth = getAuth();
-    await signOut(auth);
-    users.user = null;
-  } catch (error) {
-    console.error(error);
-  }
-}
-function verify() {
-  siteStore().setLoading(true);
-  var user = getAuth().currentUser;
-
-  sendEmailVerification(user)
-    .then(() => {
-      emailSent.value = `Email Sent! to ${user.email}`;
-    })
-    .catch(error => {
-      emailSent.value = `Error: ${error}`;
+onBeforeMount(() => {
+  site.setLoading(true);
+  fbAdmin.listAllUsers().then(users => {
+    users.users.forEach(user => {
+      allUsers.value.push({value: user.uid, label: user.displayName});
     });
-  siteStore().setLoading(false);
-}
+  });
+  site.setLoading(false);
+});
 </script>
 
 <style scoped>
@@ -91,6 +58,9 @@ form {
   flex-direction: row;
   align-items: center;
   height: 100%;
+}
+.error {
+  color: red;
 }
 .form-button {
   width: 98%;
@@ -137,7 +107,6 @@ form {
 }
 .logo-container {
   width: 70%;
-  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -175,7 +144,6 @@ form {
     justify-content: center;
   }
   .logo-container {
-    width: 100%;
     height: 40%;
     align-items: center;
   }

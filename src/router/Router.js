@@ -1,13 +1,42 @@
 import {createRouter, createWebHistory} from 'vue-router';
 import {usersStore} from '../store/Users.js';
+import {siteStore} from '../store/Site.js';
 
 const routes = [
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: () => import('../pages/Admin.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: false,
+    },
+  },
   {
     path: '/',
     name: 'Home',
     component: () => import('../pages/Home.vue'),
     meta: {
       requiresAuth: true,
+      requiresAdmin: false,
+    },
+  },
+  {
+    path: '/users',
+    name: 'Users',
+    component: () => import('../pages/Users.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
+    path: '/time',
+    name: 'Time',
+    component: () => import('../pages/Time.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: false,
     },
   },
   {
@@ -16,6 +45,7 @@ const routes = [
     component: () => import('../pages/Profile.vue'),
     meta: {
       requiresAuth: true,
+      requiresAdmin: false,
     },
   },
   {
@@ -24,6 +54,7 @@ const routes = [
     component: () => import('../pages/Login.vue'),
     meta: {
       requiresAuth: false,
+      requiresAdmin: false,
     },
   },
   {
@@ -32,6 +63,7 @@ const routes = [
     component: () => import('../pages/Register.vue'),
     meta: {
       requiresAuth: false,
+      requiresAdmin: false,
     },
   },
   {
@@ -40,6 +72,7 @@ const routes = [
     component: () => import('../pages/Verified.vue'),
     meta: {
       requiresAuth: true,
+      requiresAdmin: false,
     },
   },
   {
@@ -48,6 +81,7 @@ const routes = [
     component: () => import('../pages/Forgot.vue'),
     meta: {
       requiresAuth: false,
+      requiresAdmin: false,
     },
   },
 ];
@@ -56,6 +90,7 @@ const router = createRouter({history: createWebHistory(), routes});
 
 router.beforeEach(async (to, from, next) => {
   const users = usersStore().user;
+  const site = siteStore().admin;
   if (to.meta.requiresAuth && !users) {
     next('/login');
     return;
@@ -66,15 +101,13 @@ router.beforeEach(async (to, from, next) => {
   if (users && !users.emailVerified && to.name !== 'Verified') {
     next('/verified');
     return;
-  } else if (users && users.emailVerified && to.name === 'Verified') {
-    console.log('verified');
-    next('/');
+  }
+  if(users && to.name !== 'Admin' && (site === null || site === false)) {
+    next('/admin');
     return;
   }
-  else {
-    next();
-  }
-  
+  next();
+ 
 });
 
 export default router;

@@ -204,8 +204,10 @@ button {
 }
 form {
   width: 100%;
-  height: 100vh;
   display: flex;
+}
+.error {
+  color: red;
 }
 .card-container {
   width: 80%;
@@ -217,7 +219,7 @@ form {
 .component-flex {
   display: flex;
   flex-direction: row-reverse;
-  align-items: center;
+  align-items: flex-end;
   height: 100%;
 }
 .form-button {
@@ -268,7 +270,7 @@ form {
 }
 .logo-container {
   width: 20%;
-  height: 100vh;
+  height: 100%;
   display: flex;
   margin-top: -3em;
   justify-content: center;
@@ -279,10 +281,12 @@ form {
   font-size: 2em;
   font-weight: bolder;
   color: #01a7c2;
+  margin-bottom: 1em;
 }
 .site-container {
   margin: 0px;
   padding: 0px;
+  height: 100vh;
 }
 
 @media screen and (max-width: 820px) {
